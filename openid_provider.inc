@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Create an association with an RP
