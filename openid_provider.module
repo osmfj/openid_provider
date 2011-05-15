@@ -309,7 +309,7 @@ function openid_provider_pathauto($op) {
       $settings['token_type'] = 'user';
       $settings['groupheader'] = t('OpenID Provider settings');
       $settings['patterndescr'] = t('Pattern for OpenID provider identity paths');
-      $settings['patterndefault'] = t('users/[user-raw]/openid');
+      $settings['patterndefault'] = t('users/[user-raw]/identity');
       $patterns = token_get_list('user');
       foreach ($patterns as $type => $pattern_set) {
         if ($type != 'global') {
@@ -331,7 +331,7 @@ function openid_provider_pathauto($op) {
  * Bulk generate aliases for all Open ID identity paths without aliases.
  */
 function openid_provider_pathauto_bulkupdate() {
-  $query = "SELECT uid, name, src, dst FROM {users} LEFT JOIN {url_alias} ON CONCAT('user/', CAST(uid AS CHAR) ,'/openid') = src WHERE uid > 0 AND src IS NULL";
+  $query = "SELECT uid, name, src, dst FROM {users} LEFT JOIN {url_alias} ON CONCAT('user/', CAST(uid AS CHAR) ,'/identity') = src WHERE uid > 0 AND src IS NULL";
   $result = db_query_range($query, 0, variable_get('pathauto_max_bulk_update', 50));
 
   $count = 0;
