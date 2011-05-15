@@ -108,7 +108,7 @@ function openid_provider_user($op, &$edit, &$account, $category = NULL) {
     case 'insert':
     case 'update':
       if (module_exists('pathauto')) {
-        _pathauto_include();
+        module_load_include('inc', 'pathauto');
         // Use the username to automatically create an alias
         $pathauto_user = (object) array_merge((array) $account, $edit);
         if ($account->name) {
