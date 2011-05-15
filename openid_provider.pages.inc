@@ -17,7 +17,7 @@ function openid_provider_endpoint($request = array()) {
   if (count($request) == 0) {
     $request = _openid_response();
   }
-  
+
   if (isset($request['openid.mode'])) {
     switch ($request['openid.mode']) {
       case 'associate':
@@ -48,7 +48,7 @@ function openid_provider_page($account) {
  */
 function openid_provider_continue() {
   module_load_include('inc', 'openid');
-  
+
   if (isset($_SESSION['openid_provider']['request'])) {
     $request = $_SESSION['openid_provider']['request'];
     unset($_SESSION['openid_provider']['request']);
@@ -86,7 +86,7 @@ function openid_provider_sites_form($form_state, $user = NULL) {
   if (!$user) {
     global $user;
   }
-  
+
   module_load_include('inc', 'openid_provider');
 
   $result = pager_query("SELECT * FROM {openid_provider_relying_party} WHERE uid=%d ORDER BY last_time DESC", 50, 0, NULL, $user->uid);
@@ -95,7 +95,7 @@ function openid_provider_sites_form($form_state, $user = NULL) {
       '#type' => 'item',
       '#description' => t('Those are the sites you have used your OpenID on. Access control determines if you will be asked for approval when login into those sites using your OpenID. You can also completely deny access to those sites if you think they are malicious.'),
   );
-  
+
   $form['submit'] = array(
       '#type' => 'submit',
       '#value' => t('Update'),

@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Install, update and uninstall functions for the openid_provider module.
+ */
+
+/**
  * Implementation of hook_install().
  */
 function openid_provider_install() {
@@ -94,7 +99,7 @@ function openid_provider_schema() {
       'created' => array(
         'type' => 'int',
         'not null' => TRUE,
-        'default' => 0,        
+        'default' => 0,
       ),
       'expires_in' => array(
         'type' => 'int',

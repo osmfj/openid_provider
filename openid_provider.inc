@@ -1,13 +1,18 @@
 <?php
 
 /**
+ * @file
+ * Additional functions used bu OpenID 2.0 Provider.
+ */
+
+/**
  * Create an association with an RP
  *
  * @param array $request
  */
 function openid_provider_association_response($request) {
   module_load_include('inc', 'openid');
-  
+
   $session_type = $request['openid.session_type'];
   $assoc_type = $request['openid.assoc_type'];
   $dh_modulus = $request['openid.dh_modulus'];
@@ -19,7 +24,7 @@ function openid_provider_association_response($request) {
 
   // CLEAR STALE ASSOCIATIONS
   db_query("DELETE FROM {openid_provider_association} WHERE created + expires_in < %d", time());
-  
+
   $response = array(
     'ns' => OPENID_NS_2_0,
     'session_type' => $session_type,
@@ -27,7 +32,7 @@ function openid_provider_association_response($request) {
     'assoc_type' => $assoc_type,
     'expires_in' => $expires_in
   );
-  
+
   if ($session_type == 'DH-SHA1'
         || (($session_type == '' || $session_type == 'no-encryption')
             && $assoc_type == 'HMAC-SHA1')) {
@@ -54,7 +59,7 @@ function openid_provider_association_response($request) {
   // Save the association for reference when dealing
   // with future requests from the same RP.
   db_query("INSERT INTO {openid_provider_association} (assoc_handle, assoc_type, session_type, mac_key, created, expires_in) VALUES ('%s', '%s', '%s', '%s', %d, %d)",
-           $assoc_handle, $assoc_type, $session_type, $mac_key, time(), $expires_in);
+          $assoc_handle, $assoc_type, $session_type, $mac_key, time(), $expires_in);
 
   $message = _openid_create_message($response);
 
@@ -81,7 +86,7 @@ function openid_provider_association_error() {
 /**
  * Generate an authentication response
  *
- * @param 
+ * @param
  */
 function openid_provider_authentication_response($request) {
   global $user;
@@ -124,7 +129,7 @@ function openid_provider_authentication_response($request) {
   if ($request['openid.mode'] == 'checkid_immediate') {
     // TODO
   }
-  
+
   $parts = parse_url($request['openid.return_to']);
   if (isset($parts['query'])) {
     $query = $parts['query'];
@@ -136,15 +141,15 @@ function openid_provider_authentication_response($request) {
 
   // calling hook_openid so we can do response parsing and send any pertinent data back to the user
   $response = array_merge($response, module_invoke_all('openid_provider', 'response', $response, $request));
-  
+
   $rp = _openid_provider_rp_load($user->uid, $realm);
   if ($rp->auto_release) {
     $response = _openid_provider_sign($response);
     _openid_provider_rp_save($user->uid, $realm, TRUE);
-    return openid_redirect_http($response['openid.return_to'], $response); 
+    return openid_redirect_http($response['openid.return_to'], $response);
   }
   else {
-    // Unset global post variable, otherwise FAPI will assume it has been 
+    // Unset global post variable, otherwise FAPI will assume it has been
     // submitted against openid_provider_form.
     unset($_POST);
     return drupal_get_form('openid_provider_form', $response, $realm);
@@ -194,7 +199,7 @@ function openid_provider_dh_assoc($request, $secret, $algo = 'sha1') {
   if (empty($request['openid.dh_consumer_public'])) {
     return FALSE;
   }
-  
+
   if (isset($request['openid.dh_modulus'])) {
     $mod = _openid_dh_base64_to_long($request['openid.dh_modulus']);
   }
@@ -212,11 +217,11 @@ function openid_provider_dh_assoc($request, $secret, $algo = 'sha1') {
   $r = _openid_dh_rand($mod);
   $private = _openid_provider_add($r, 1);
   $public = _openid_provider_powmod($gen, $private, $mod);
-  
+
   $cpub = _openid_dh_base64_to_long($request['openid.dh_consumer_public']);
   $shared = _openid_provider_powmod($cpub, $private, $mod);
   $mac_key = _openid_provider_dh_xorsecret($shared, $secret, $algo);
-  $enc_mac_key = base64_encode($mac_key);  
+  $enc_mac_key = base64_encode($mac_key);
   $spub64 = _openid_dh_long_to_base64($public);
   return array(
     'dh_server_public' => $spub64,
@@ -248,11 +253,11 @@ function _openid_provider_dh_xorsecret($shared, $secret, $algo = 'sha1') {
 // Request is: Exact copies of all fields from the authentication response
 function openid_provider_verification_response($request) {
   $is_valid = TRUE;
-  
+
   // Use the request openid.assoc_handle to look up
   // how this message should be signed, based on
   // a previously-created association.
-  $assoc = db_fetch_object(db_query("SELECT * FROM {openid_provider_association} WHERE assoc_handle = '%s'", 
+  $assoc = db_fetch_object(db_query("SELECT * FROM {openid_provider_association} WHERE assoc_handle = '%s'",
     $request['openid.assoc_handle']));
 
   $signed_keys = explode(',', $request['openid.signed']);
@@ -274,7 +279,7 @@ function openid_provider_verification_response($request) {
 
   $message = _openid_create_message($response);
   header("Content-Type: text/plain");
-  print $message;  
+  print $message;
 }
 
 function openid_provider_cancel_authentication_response($mode = 'checkid_immediate') {
@@ -305,16 +310,17 @@ function _openid_provider_rp_load($uid, $realm = NULL) {
     return $rps;
   }
 }
-  
+
 function _openid_provider_rp_save($uid, $realm, $auto_release = FALSE) {
   $rpid = db_result(db_query("SELECT rpid FROM {openid_provider_relying_party} WHERE uid=%d AND realm='%s'", $uid, $realm));
   if ($rpid) {
-    db_query("UPDATE {openid_provider_relying_party} SET auto_release=%d, last_time=%d WHERE rpid=%d", $auto_release, time(), $rpid);  
+    db_query("UPDATE {openid_provider_relying_party} SET auto_release=%d, last_time=%d WHERE rpid=%d", $auto_release, time(), $rpid);
   }
   else {
     db_query("INSERT INTO {openid_provider_relying_party} (uid, realm, first_time, last_time, auto_release) VALUES (%d, '%s', %d, %d, %d)", $uid, $realm, time(), time(), $auto_release);
   }
 }
+
 function _openid_provider_nonce() {
   // YYYY-MM-DDThh:mm:ssTZD UTC, plus some optional extra unique chars
   return gmstrftime('%Y-%m-%dT%H:%M:%SZ') .
@@ -326,7 +332,7 @@ function _openid_provider_nonce() {
 
 function _openid_provider_sign($response) {
   module_load_include('inc', 'openid');
-  
+
   $also_sign = array();
   $parts = parse_url($response['openid.return_to']);
   if (isset($parts['query'])) {
@@ -341,13 +347,13 @@ function _openid_provider_sign($response) {
   $signed_keys = array('op_endpoint', 'return_to', 'response_nonce', 'assoc_handle', 'identity', 'claimed_id');
   $signed_keys = array_merge($signed_keys, module_invoke_all('openid_provider', 'signed', $response));
   $response['openid.signed'] = implode(',', $signed_keys);
-  
+
   // Use the request openid.assoc_handle to look up
   // how this message should be signed, based on
   // a previously-created association.
-  $assoc = db_fetch_object(db_query("SELECT * FROM {openid_provider_association} WHERE assoc_handle = '%s'", 
+  $assoc = db_fetch_object(db_query("SELECT * FROM {openid_provider_association} WHERE assoc_handle = '%s'",
                                     $response['openid.assoc_handle']));
-  
+
   // Generate signature for this message
   $response['openid.sig'] = _openid_provider_signature($assoc, $response, $signed_keys);
   return $response;
@@ -379,7 +385,7 @@ function _openid_provider_add($a, $b) {
   if (function_exists('gmp_add')) {
     return gmp_add($a, $b);
   }
-  else if (function_exists('bcadd')) {
+  elseif (function_exists('bcadd')) {
     return bcadd($a, $b);
   }
 }
@@ -388,7 +394,7 @@ function _openid_provider_powmod($base, $exp, $mod) {
   if (function_exists('gmp_powm')) {
     return gmp_powm($base, $exp, $mod);
   }
-  else if (function_exists('bcpowmod')) {
+  elseif (function_exists('bcpowmod')) {
     return bcpowmod($base, $exp, $mod);
   }
 }

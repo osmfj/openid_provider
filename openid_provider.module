@@ -66,9 +66,9 @@ function openid_provider_perm() {
   return array('manage own openid sites', 'administer openid provider');
 }
 
- /**
-  * Implementation of hook_theme()
-  */
+/**
+ * Implementation of hook_theme().
+ */
 function openid_provider_theme($existing, $type, $theme, $path) {
   return array(
     'openid_provider_sites' => array(
@@ -77,9 +77,8 @@ function openid_provider_theme($existing, $type, $theme, $path) {
   );
 }
 
-
 /**
- * Implementation of hook_init()
+ * Implementation of hook_init().
  *
  * Add appropriate HTML headers for XRDS and Link discovery.
  */
@@ -103,7 +102,7 @@ function openid_provider_sites_access($account) {
  */
 function openid_provider_user($op, &$edit, &$account, $category = NULL) {
   global $user;
-  
+
   switch ($op) {
     case 'insert':
     case 'update':
@@ -122,7 +121,7 @@ function openid_provider_user($op, &$edit, &$account, $category = NULL) {
       // If the user is deleted, remove the path aliases
       if (module_exists('pathauto')) {
         $account = (object) $account;
-       	path_set_alias(openid_provider_user_path($account->uid));
+        path_set_alias(openid_provider_user_path($account->uid));
       }
       break;
     case 'view':
@@ -188,7 +187,7 @@ function openid_provider_admin_settings() {
  */
 function openid_provider_xrds($account = NULL) {
   module_load_include('inc', 'openid');
-  
+
   if ($account) {
     $types = array(OPENID_NS_2_0 .'/signon');
   }
@@ -203,7 +202,7 @@ function openid_provider_xrds($account = NULL) {
   if ($account->uid) {
     $data['LocalID'] = array(openid_provider_url(openid_provider_user_path($account->uid)));
   }
-  
+
   $xrds['openid_provider'] = array(
     'services' => array(
       array('priority' => 10,
@@ -221,14 +220,14 @@ function openid_provider_xrds($account = NULL) {
 function openid_provider_form(&$form_state, $response = array(), $realm = NULL) {
   global $user;
 
-  // Use form_state to store the $response and $realm values 
+  // Use form_state to store the $response and $realm values
   if (count($response)) {
     $form_state['storage']['response'] = $response;
   }
   else {
     $response = $form_state['storage']['response'];
   }
-  
+ 
   if ($realm) {
     $form_state['storage']['realm'] = $realm;
   }
@@ -273,7 +272,7 @@ function openid_provider_form_submit(&$form, $form_state, $auto_release = FALSE)
 
   module_load_include('inc', 'openid');
   module_load_include('inc', 'openid_provider');
-  
+
   $response = _openid_provider_sign($form_state['storage']['response']);
   _openid_provider_rp_save($user->uid, $form_state['storage']['realm'], $auto_release);
   openid_redirect_http($response['openid.return_to'], $response);
@@ -285,15 +284,15 @@ function openid_provider_form_submit(&$form, $form_state, $auto_release = FALSE)
 function openid_provider_form_submit_always(&$form, $form_state) {
   return openid_provider_form_submit($form, $form_state, TRUE);
 }
- 
+
 /**
  * Cancel submit handler
  */
 function openid_provider_form_submit_cancel(&$form, $form_state) {
   module_load_include('inc', 'openid_provider');
   module_load_include('inc', 'openid');
-  
-  $return_to = $form_state['storage']['response']['openid.return_to'];  
+
+  $return_to = $form_state['storage']['response']['openid.return_to'];
   $response = openid_provider_cancel_authentication_response($form_state['openid.mode']);
   openid_redirect($return_to, $response);
 }
