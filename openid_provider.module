@@ -331,8 +331,9 @@ function openid_provider_pathauto($op) {
  * Bulk generate aliases for all Open ID identity paths without aliases.
  */
 function openid_provider_pathauto_bulkupdate() {
-  $query = "SELECT uid, name, src, dst FROM {users} LEFT JOIN {url_alias} ON CONCAT('user/', CAST(uid AS CHAR) ,'/identity') = src WHERE uid > 0 AND src IS NULL";
-  $result = db_query_range($query, 0, variable_get('pathauto_max_bulk_update', 50));
+  // Somewhat convoluted expression, for compatibility with both MySQL and PostgreSQL
+  $query = "SELECT u.uid, u.name, a.src, a.dst FROM {users} u LEFT JOIN {url_alias} a ON REPLACE('%s', '%%user', CAST(u.uid AS CHAR(10))) = a.src WHERE u.uid > 0 AND a.src IS NULL";
+  $result = db_query_range($query, openid_provider_user_path('%user'), 0, variable_get('pathauto_max_bulk_update', 50));
 
   $count = 0;
   $placeholders = array();
