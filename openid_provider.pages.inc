@@ -93,7 +93,7 @@ function openid_provider_sites_form($form_state, $user = NULL) {
 
   $form['description'] = array(
       '#type' => 'item',
-      '#description' => t('Those are the sites you have used your OpenID on. Access control determines determines if you will be asked for approval when login into those sites using your OpenID. You can also completely deny access to those sites if you think they are malicious.'),
+      '#description' => t('Those are the sites you have used your OpenID on. Access control determines if you will be asked for approval when login into those sites using your OpenID. You can also completely deny access to those sites if you think they are malicious.'),
   );
   
   $form['submit'] = array(
