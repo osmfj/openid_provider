@@ -111,6 +111,21 @@ function openid_provider_authentication_response($request) {
     }
   }
 
+  /*
+   * according to section 9.1, an empty assoc_handle should make the
+   * 'transaction take place in "Stateless mode"'
+   * https://openid.net/specs/openid-authentication-2_0.html#requesting_authentication
+   *
+   * we do not support this yet: https://drupal.org/node/506530 - this is a
+   * workaround to fix https://drupal.org/node/1158356
+   *
+   * the spec, however, clearly states that responses MUST have that value set,
+   * so we generate a new one if the client didn't provide any
+   */
+  $assoc_handle = $request['openid.assoc_handle'];
+  if (!$assoc_handle) {
+    $assoc_handle = _openid_provider_nonce();
+  }
   $response = array(
     'openid.ns' => OPENID_NS_2_0,
     'openid.mode' => 'id_res',
@@ -119,7 +134,7 @@ function openid_provider_authentication_response($request) {
     'openid.claimed_id' => $identity,
     'openid.return_to' => $request['openid.return_to'],
     'openid.response_nonce' => _openid_provider_nonce(),
-    'openid.assoc_handle' => $request['openid.assoc_handle'],
+    'openid.assoc_handle' => $assoc_handle,
     'openid.sreg.nickname' => $user->name,
     'openid.sreg.email' => $user->mail
   );
