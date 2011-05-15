@@ -178,7 +178,12 @@ function openid_provider_authentication_error($mode) {
  */
 function openid_provider_unsolicited_assertion($response, $url) {
   $response = _openid_provider_sign($response);
-  $result = drupal_http_request($url, array(), 'GET', $response);
+  $query = array();
+  foreach ($response as $key => $value)  {
+    $query[] = $key .'='. urlencode($value);
+  }
+  $url .= (strpos('?', $url) ? '&' : '?') . implode('&', $query);
+  $result = drupal_http_request($url, array(), 'GET');
   if ($result->code == 404) {
     return FALSE;
   }
