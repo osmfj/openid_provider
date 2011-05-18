@@ -110,7 +110,7 @@ function openid_provider_authentication_response($request) {
     if ($identity != openid_provider_url(openid_provider_user_path($user->uid))) {
       $response = openid_provider_authentication_error($request['openid.mode']);
       _openid_provider_debug('authentication error response using 1.0 redirect to %url (response dump: <pre>%response</pre>)', array('%url' => $request['openid.return_to'], '%response' => var_export($response, TRUE)));
-      openid_redirect($request['openid.return_to'], $response);
+      return openid_redirect_http($request['openid.return_to'], $response);
     }
   }
 
