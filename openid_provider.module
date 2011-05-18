@@ -190,6 +190,8 @@ function openid_provider_admin_settings() {
 
 /**
  * Return a XRDS for this server to discover it based on the root url
+ *
+ * Implementation of hook_xrds().
  */
 function openid_provider_xrds($account = NULL) {
   module_load_include('inc', 'openid');
