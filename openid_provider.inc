@@ -148,7 +148,7 @@ function openid_provider_authentication_response($request) {
   if ($rp->auto_release) {
     $response = _openid_provider_sign($response);
     _openid_provider_rp_save($user->uid, $realm, TRUE);
-    _openid_provider_debug('automatic response authentication success using 2.0 redirect to %url (response dump: <pre>%response</pre>)', array('%url' => $request['openid.return_to'], '%response' => var_export($response, TRUE)));
+    _openid_provider_debug('automatic response authentication success using 1.0 redirect to %url (response dump: <pre>%response</pre>)', array('%url' => $request['openid.return_to'], '%response' => var_export($response, TRUE)));
     return openid_redirect_http($response['openid.return_to'], $response);
   }
   else {
