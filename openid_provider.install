@@ -19,6 +19,7 @@ function openid_provider_install() {
 function openid_provider_uninstall() {
   // Remove tables.
   drupal_uninstall_schema('openid_provider');
+  variable_del('openid_provider_debugging');
 }
 
 /**
