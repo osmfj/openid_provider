@@ -19,7 +19,7 @@ function openid_provider_endpoint($request = array()) {
   }
 
   if (isset($request['openid.mode'])) {
-    _openid_provider_debug('endpoint called in mode %mode (request dump: %request)', array('%mode' => $request['openid.mode'], '%request' => var_export($request, TRUE)));
+    _openid_provider_debug('endpoint called in mode %mode (request dump: <pre>%request</per>)', array('%mode' => $request['openid.mode'], '%request' => var_export($request, TRUE)));
     switch ($request['openid.mode']) {
       case 'associate':
         openid_provider_association_response($request);

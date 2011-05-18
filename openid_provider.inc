@@ -62,7 +62,7 @@ function openid_provider_association_response($request) {
           $assoc_handle, $assoc_type, $session_type, $mac_key, time(), $expires_in);
 
   $message = _openid_create_message($response);
-  _openid_provider_debug('recorded association (response: %message)', array('%message' => $message));
+  _openid_provider_debug('recorded association (response: <pre>%message</pre>)', array('%message' => $message));
 
   drupal_set_header('HTTP/1.1 200 OK');
   drupal_set_header("Content-Type: text/plain");
@@ -109,7 +109,7 @@ function openid_provider_authentication_response($request) {
     $identity = $request['openid.identity'];
     if ($identity != openid_provider_url(openid_provider_user_path($user->uid))) {
       $response = openid_provider_authentication_error($request['openid.mode']);
-      _openid_provider_debug('authentication error response using 1.0 redirect to %url (response dump: %response)', array('%url' => $request['openid.return_to'], '%response' => var_export($response, TRUE)));
+      _openid_provider_debug('authentication error response using 1.0 redirect to %url (response dump: <pre>%response</pre>)', array('%url' => $request['openid.return_to'], '%response' => var_export($response, TRUE)));
       openid_redirect($request['openid.return_to'], $response);
     }
   }
@@ -148,7 +148,7 @@ function openid_provider_authentication_response($request) {
   if ($rp->auto_release) {
     $response = _openid_provider_sign($response);
     _openid_provider_rp_save($user->uid, $realm, TRUE);
-    _openid_provider_debug('automatic response authentication success using 2.0 redirect to %url (response dump: %response)', array('%url' => $request['openid.return_to'], '%response' => var_export($response, TRUE)));
+    _openid_provider_debug('automatic response authentication success using 2.0 redirect to %url (response dump: <pre>%response</pre>)', array('%url' => $request['openid.return_to'], '%response' => var_export($response, TRUE)));
     return openid_redirect_http($response['openid.return_to'], $response);
   }
   else {
@@ -281,7 +281,7 @@ function openid_provider_verification_response($request) {
   }
 
   $message = _openid_create_message($response);
-  _openid_provider_debug('verification response (response: %message)', array('%message' => $message));
+  _openid_provider_debug('verification response (response: <pre>%message</pre>)', array('%message' => $message));
   header("Content-Type: text/plain");
   print $message;
 }
