@@ -15,9 +15,6 @@ function openid_provider_association_response($request) {
 
   $session_type = $request['openid.session_type'];
   $assoc_type = $request['openid.assoc_type'];
-  $dh_modulus = $request['openid.dh_modulus'];
-  $dh_gen = $request['openid.dh_gen'];
-  $dh_consumer_public = $request['openid.dh_consumer_public'];
 
   $assoc_handle = _openid_provider_nonce();
   $expires_in = variable_get('openid_provider_assoc_expires_in', '3600');
