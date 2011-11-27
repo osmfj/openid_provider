@@ -132,7 +132,7 @@ function openid_provider_authentication_response($request) {
     'openid.op_endpoint' => openid_provider_url('openid/provider'),
     'openid.identity' => $identity,
     'openid.claimed_id' => $identity,
-    'openid.return_to' => $request['openid.return_to'],
+    'openid.return_to' => $request['openid.return_to'], 
     'openid.response_nonce' => _openid_provider_nonce(),
     'openid.assoc_handle' => $assoc_handle,
     'openid.sreg.nickname' => $user->name,
@@ -142,15 +142,6 @@ function openid_provider_authentication_response($request) {
   // Is the RP requesting Immediate or Indirect mode?
   if ($request['openid.mode'] == 'checkid_immediate') {
     // TODO
-  }
-
-  $parts = parse_url($request['openid.return_to']);
-  if (isset($parts['query'])) {
-    $query = $parts['query'];
-    $q = _openid_get_params($query);
-    foreach ($q as $key => $val) {
-      $response[$key] = $val;
-    }
   }
 
   // calling hook_openid so we can do response parsing and send any pertinent data back to the user
@@ -348,17 +339,6 @@ function _openid_provider_nonce() {
 
 function _openid_provider_sign($response) {
   module_load_include('inc', 'openid');
-
-  $also_sign = array();
-  $parts = parse_url($response['openid.return_to']);
-  if (isset($parts['query'])) {
-    $query = $parts['query'];
-    $q = _openid_get_params($query);
-    foreach ($q as $key => $val) {
-      $also_sign[] = $key;
-      $response[$key] = $val;
-    }
-  }
 
   $signed_keys = array('op_endpoint', 'return_to', 'response_nonce', 'assoc_handle', 'identity', 'claimed_id');
   $signed_keys = array_merge($signed_keys, module_invoke_all('openid_provider', 'signed', $response));
